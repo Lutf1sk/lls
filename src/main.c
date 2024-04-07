@@ -151,8 +151,6 @@ void print_default(lstr_t path) {
 
 	lt_stat_t* entry_stats = lt_malloc(lt_libc_heap, lt_darr_count(entries) * sizeof(lt_stat_t));
 
-	lt_printf("%uz / %uz\n", term_w, max_name_len);
-
 	usz columns = lt_clamp_usz(term_w / max_name_len, 1, MAX_COLUMNS);
 
 	u32 column_widths[MAX_COLUMNS];
