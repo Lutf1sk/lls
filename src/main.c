@@ -33,7 +33,7 @@ struct entry {
 } entry_t;
 
 b8 lstr_lesser_alphabetic(lstr_t a, lstr_t b) {
-	usz len = lt_min_usz(a.len, b.len);
+	usz len = lt_min(a.len, b.len);
 	for (usz i = 0; i < len; ++i) {
 		u8 ac = lt_to_upper(a.str[i]), bc = lt_to_upper(b.str[i]);
 
@@ -120,8 +120,8 @@ void print_detailed(lstr_t path) {
 
 #endif
 
-		usz padusr = lt_max_isz(8 - strlen(owner), 1);
-		usz padgrp = lt_max_isz(8 - strlen(group), 1);
+		usz padusr = lt_isz_max(8 - strlen(owner), 1);
+		usz padgrp = lt_isz_max(8 - strlen(group), 1);
 
 		lt_printf("%S %s%r %s%r %S ", LSTR(permit, sizeof(permit)), owner, padusr, group, padgrp, LSTR(size, sizeof(size)));
 
@@ -151,7 +151,7 @@ void print_default(lstr_t path) {
 
 	lt_stat_t* entry_stats = lt_malloc(lt_libc_heap, lt_darr_count(entries) * sizeof(lt_stat_t));
 
-	usz columns = lt_clamp_usz(term_w / max_name_len, 1, MAX_COLUMNS);
+	usz columns = lt_clamp(term_w / max_name_len, 1, MAX_COLUMNS);
 
 	u32 column_widths[MAX_COLUMNS];
 	lt_mset32(column_widths, 1, sizeof(column_widths));
@@ -169,15 +169,15 @@ void print_default(lstr_t path) {
 		lt_mfree(lt_libc_heap, full_path.str);
 
 		usz col = i % columns;
-		isz size_len = lt_io_printf(lt_io_dummy_callb, NULL, "%mz", entry_stats[i].size);
+		isz size_len = lt_io_printf(lt_io_dummy_write, NULL, "%mz", entry_stats[i].size);
 		if (size_len) {
-			column_size_pad[col] = lt_max_usz(column_size_pad[col], size_len + 1);
+			column_size_pad[col] = lt_max(column_size_pad[col], size_len + 1);
 		}
-		column_widths[col] = lt_max_usz(column_widths[col], entries[i].len + 2);
+		column_widths[col] = lt_max(column_widths[col], entries[i].len + 2);
 	}
 
 	for (usz i = 0; i < lt_darr_count(entries); ) {
-		usz row_end = lt_min_usz(i + columns, lt_darr_count(entries));
+		usz row_end = lt_min(i + columns, lt_darr_count(entries));
 
 		for (; i < row_end; ++i) {
 			usz col = i % columns;
@@ -344,7 +344,7 @@ int main(int argc, char** argv) {
 			continue;
 		}
 
-		max_name_len = lt_max_usz(max_name_len, ent->name.len + 2);
+		max_name_len = lt_max(max_name_len, ent->name.len + 2);
 
 		lstr_t name = lt_strdup(lt_libc_heap, ent->name);
 		LT_ASSERT(name.str != NULL);
@@ -352,7 +352,7 @@ int main(int argc, char** argv) {
 	}
 	lt_dclose(dir, lt_libc_heap);
 
-	sort_list(entries, lt_darr_count(entries));
+	sort_list(lt_darr_count(entries), entries);
 
 	if (format == FORMAT_DEFAULT) {
 		print_default(path);
