@@ -251,6 +251,7 @@ int main(int argc, char** argv) {
 				"  -p, --permit  Show entry permissions.\n"
 				"  -s, --size    Show file size\n"
 			);
+			return 0;
 		}
 
 		if (lt_arg_flag(arg, 'a', CLSTR("hidden"))) {
